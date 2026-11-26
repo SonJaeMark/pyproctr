@@ -1,0 +1,7 @@
+# requirements.txt
+Django>=6.1,<6.2
+gunicorn>=23.0
+whitenoise>=6.8
+python-dotenv>=1.0
+requests>=2.32
+ruff>=0.9
