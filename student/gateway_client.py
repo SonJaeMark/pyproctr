@@ -1,3 +1,4 @@
+import gzip
 import json
 
 import requests
@@ -18,30 +19,9 @@ def _gateway_url(path: str) -> str:
 
 def _parse_json_safe(resp: requests.Response) -> dict:
     raw = resp.content
-    if not raw or not raw.strip():
-        raise GatewayError(
-            f"Gateway returned an empty response (HTTP {resp.status_code}). Please try again.",
-            status_code=resp.status_code or 502,
-        )
-
-    try:
-        text = raw.decode("utf-8")
-        data = json.loads(text)
-    except (UnicodeDecodeError, ValueError) as exc:
-        content_type = resp.headers.get("Content-Type", "unknown")
-        content_encoding = resp.headers.get("Content-Encoding", "none")
-        raise GatewayError(
-            f"Gateway returned non-JSON payload (HTTP {resp.status_code}, {len(raw)} bytes, "
-            f"Content-Type: {content_type}, Content-Encoding: {content_encoding}).",
-            status_code=resp.status_code or 502,
-        ) from exc
-
-    if not isinstance(data, dict):
-        raise GatewayError(
-            "Unexpected response format from authentication gateway.",
-            status_code=502,
-        )
-    return data
+    if raw[:2] == b"\x1f\x8b":  # still gzip after requests' decode
+        raw = gzip.decompress(raw)
+        print(raw[:4], resp.headers)
 
 
 def login_student(email: str, password: str) -> dict:
