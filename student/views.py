@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 
 from .gateway_client import (
@@ -6,6 +7,10 @@ from .gateway_client import (
     login_student,
     refresh_access_token,
 )
+
+
+def health_check(request):
+    return JsonResponse({"status": "ok"})
 
 
 def login_page(request):
