@@ -35,6 +35,11 @@ ALLOWED_HOSTS = [
 ]
 
 
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+SESSION_COOKIE_HTTPONLY = True  # already the default, keep it
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 # Application definition
 
 INSTALLED_APPS = [
