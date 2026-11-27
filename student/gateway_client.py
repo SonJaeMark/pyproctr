@@ -131,3 +131,19 @@ def refresh_access_token(refresh_token: str) -> dict | None:
         except GatewayError:
             return None
     return None
+
+def logout_session(access_token: str, refresh_token: str | None) -> bool:
+    """Best-effort revoke of the refresh token via the gateway. Returns True on 204."""
+    try:
+        resp = requests.post(
+            _gateway_url("/api/v1/auth/logout"),
+            json={"refreshToken": refresh_token or ""},
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+            },
+            timeout=settings.API_GATEWAY_TIMEOUT,
+        )
+    except requests.RequestException:
+        return False
+    return resp.status_code == 204
