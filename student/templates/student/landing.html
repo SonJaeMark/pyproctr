@@ -4,8 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Landing</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: #f4f6f9;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+    .topbar .brand { font-weight: 700; }
+    .topbar form { margin: 0; }
+    .logout-btn {
+      padding: 0.5rem 1rem;
+      background: #dc2626;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .logout-btn:hover { background: #b91c1c; }
+    .error {
+      margin: 1rem 1.5rem;
+      padding: 0.6rem 0.75rem;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+  </style>
 </head>
 <body>
-  <!-- Blank for now -->
+  <header class="topbar">
+    <span class="brand">PyProctor</span>
+    <form method="post" action="{% url 'student:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">Log Out</button>
+    </form>
+  </header>
+
+  {% if gateway_error %}
+    <div class="error">{{ gateway_error }}</div>
+  {% endif %}
+
+  <!-- Landing content goes here -->
 </body>
 </html>

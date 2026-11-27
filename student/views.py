@@ -1,10 +1,13 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
+
 
 from .gateway_client import (
     GatewayError,
     get_current_user,
     login_student,
+    logout_session,
     refresh_access_token,
 )
 
@@ -85,3 +88,22 @@ def landing_page(request):
 
     # Landing page remains intentionally blank for now while verified via gateway
     return render(request, "student/landing.html", {"profile": profile})
+
+@require_POST
+def logout_view(request):
+    access_token = request.session.get("access_token")
+    refresh_token = request.session.get("refresh_token")
+
+    if access_token:
+        revoked = logout_session(access_token, refresh_token)
+
+        # Access token may have expired; refresh once so the refresh token
+        # still gets revoked server-side.
+        if not revoked and refresh_token:
+            refreshed = refresh_access_token(refresh_token)
+            if refreshed and refreshed.get("accessToken"):
+                logout_session(refreshed["accessToken"], refresh_token)
+
+    # Always clear the local session, even if the gateway call failed.
+    request.session.flush()
+    return redirect("student:login_page")
